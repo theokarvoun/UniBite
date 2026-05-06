@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniBite</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+  <!-- 🔝 TOP NAVBAR -->
+   <div id="top-bar"></div>
+   <script src="../js/components/top-bar-loader.js"></script>
+  <!-- 📱 MAIN LAYOUT -->
+  <main class="app-layout">
+
+    <!-- 🔍 SIDEBAR -->
+    <aside class="sidebar">
+
+      <h3>Filters</h3>
+
+      <input type="text" id="searchInput" placeholder="Search meals...">
+
+      <label>Sort by:</label>
+      <select id="sortSelect">
+        <option value="newest">Newest</option>
+        <option value="distance">Distance</option>
+      </select>
+
+      <label>Allergens:</label>
+      <div class="checkbox-group">
+  <label><input type="checkbox" value="celery"> Celery</label>
+  <label><input type="checkbox" value="gluten"> Cereals containing gluten</label>
+  <label><input type="checkbox" value="crustaceans"> Crustaceans</label>
+  <label><input type="checkbox" value="eggs"> Eggs</label>
+  <label><input type="checkbox" value="fish"> Fish</label>
+  <label><input type="checkbox" value="lupin"> Lupin</label>
+  <label><input type="checkbox" value="milk"> Milk</label>
+  <label><input type="checkbox" value="molluscs"> Molluscs</label>
+  <label><input type="checkbox" value="mustard"> Mustard</label>
+  <label><input type="checkbox" value="nuts"> Tree Nuts</label>
+  <label><input type="checkbox" value="peanuts"> Peanuts</label>
+  <label><input type="checkbox" value="sesame"> Sesame Seeds</label>
+  <label><input type="checkbox" value="soybeans"> Soybeans</label>
+  <label><input type="checkbox" value="sulphites"> Sulphur dioxide and sulphites</label>
+</div>
+
+    </aside>
+
+    <!-- 🍝 FEED CONTENT -->
+    <section class="feed">
+
+  <div class="feed-header">
+    <h2>Available Meals</h2>
+  </div>
+
+  <div id="postsContainer"></div>
+
+  <script type="module" src="../js/pages/student-feed.js"></script>
+
+</section>
+
+  </main>
+
+</body>
+</html>

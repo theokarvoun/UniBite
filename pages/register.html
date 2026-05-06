@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Εγγραφή - UniBite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+   
+</head>
+<body>
+    <div class="container">
+        <a href="login.html" class="back-link">
+            ← Επιστροφή στη σύνδεση
+        </a>
+
+        <div class="register-card">
+            <h1>Sign Up</h1>
+            <p class="subtitle">Γίνε μέλος της UniBite κοινότητας!</p>
+
+            <div class="welcome-bonus">
+                <div class="welcome-bonus-icon">🎁</div>
+                <div class="welcome-bonus-text">
+                    <strong>Δώρο Καλωσορίσματος!</strong><br>
+                    Ξεκίνα με 5 δωρεάν πόντους για να παραγγείλεις το πρώτο σου γεύμα!
+                </div>
+            </div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="fullName">Ονοματεπώνυμο <span class="required">*</span></label>
+                    <input type="text" id="fullName" name="fullName" placeholder="π.χ. Γιώργος Παπαδόπουλος" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Πανεπιστημίου <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="student@university.gr" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Τηλέφωνο <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="69XXXXXXXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Κωδικός <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="Τουλάχιστον 8 χαρακτήρες" required minlength="8">
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Επιβεβαίωση Κωδικού <span class="required">*</span></label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Ξανά ο κωδικός" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dormitory">Κατοικία</label>
+                    <input type="text" id="dormitory" name="dormitory" placeholder="π.χ. Εστία Α, Δωμάτιο 204">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Δημιουργία Λογαριασμού
+                </button>
+
+                <p class="terms">
+                    Με την εγγραφή σου, συμφωνείς με τους 
+                    <a href="#">Όρους Χρήσης</a> και την 
+                    <a href="#">Πολιτική Απορρήτου</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        src="../js/pages/register.js"
+    </script>
+</body>
+</html>

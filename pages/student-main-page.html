@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBite - Φοιτητικό Food Sharing</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">🍔 UniBite</div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Feed Αγγελιών</a></li>
+                <li><a href="#">Ο Πίνακάς μου</a></li>
+                <li><span class="points-badge">Πόντοι: <strong id="user-points">5</strong></span></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="controls">
+            <button id="add-listing-btn" class="btn primary">🍳 Προσθήκη Αγγελίας</button>
+            <button id="view-map-btn" class="btn secondary">🗺️ Προβολή Χάρτη</button>
+        </section>
+
+        <section class="feed-section">
+            <h2>Διαθέσιμα Γεύματα</h2>
+            <div id="listings-container" class="grid-container"></div>
+        </section>
+    </main>
+
+    <script src="../js/pages/app.js"></script>
+</body>
+</html>
