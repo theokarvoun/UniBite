@@ -1,0 +1,62 @@
+@startuml name 
+
+entity Student{
+  *user_id : string
+  --
+  password : string
+  saved_location : string
+  points : int
+  food_distributed : int
+}
+
+entity Admin{
+  *admin_id : string
+  --
+  password : string
+}
+
+entity Stats{
+  food_distributed : int
+
+}
+
+entity Advertisment{
+  *ad_id : int 
+  --
+  cook_id : int 
+  consumer_id : int
+  food : string 
+  photo : media
+  allergies : List<string>
+  description : text
+  quantity : int 
+  delivery_location : string 
+  delivery_time : date
+  date_of_creation : date
+  state_of_ad : enum{ACTIVE, INACTIVE, DELETED}
+}
+
+entity Request{
+  *req_id
+  --
+  success : bool
+}
+
+entity Rating{
+  *rate_id : int 
+  --
+  description : text
+  stars : int
+}
+
+Student "2...*" --> "1" Advertisment : Involves
+
+Advertisment --* Rating
+Rating --> Student : Penalty
+Student --* Request
+Request --> Advertisment : Allocates
+Stats *-- Advertisment
+Admin "1" --> Stats : Views
+Admin "1" --> "*" Student : Sorts Leaderboard
+Student "1" --> "*" Request : Concludes
+@enduml
