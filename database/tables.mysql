@@ -1,0 +1,91 @@
+DROP DATABASE IF EXISTS Unibite;
+CREATE DATABASE Unibite;
+
+use Unibite;
+
+CREATE TABLE student (
+    student_id INT PRIMARY KEY AUTO_INCREMENT,
+    student_name VARCHAR(64),
+    student_email VARCHAR(64) UNIQUE,
+    student_password VARCHAR(255),
+    advertisments_completed INT DEFAULT 0
+);
+
+CREATE TABLE advertisment (
+
+    advert_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    creator_student_id INT NOT NULL,
+    customer_student_id INT,
+
+    food_name VARCHAR(64),
+    food_photo VARCHAR(255),
+    food_description TEXT,
+    food_amount INT,
+
+    delivery_location VARCHAR(64),
+    delivery_time DATE,
+    date_of_creation DATE,
+
+    state_of_ad ENUM('ACTIVE', 'INACTIVE', 'DELETED'),
+
+    FOREIGN KEY (creator_student_id)
+        REFERENCES student(student_id),
+
+    FOREIGN KEY (customer_student_id)
+        REFERENCES student(student_id)
+);
+
+CREATE TABLE request_ad (
+
+    request_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    student_id INT,
+    advert_id INT,
+
+    request_accepted BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (student_id)
+        REFERENCES student(student_id),
+
+    FOREIGN KEY (advert_id)
+        REFERENCES advertisment(advert_id)
+);
+
+CREATE TABLE allergy_type (
+    type_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) UNIQUE
+);
+
+CREATE TABLE allergy (
+    allergy_id INT PRIMARY KEY AUTO_INCREMENT,
+    advert_id INT NOT NULL,
+    type_id INT NOT NULL,
+
+    FOREIGN KEY (advert_id) REFERENCES advertisment(advert_id),
+    FOREIGN KEY (type_id) REFERENCES allergy_type(type_id)
+);
+
+
+
+CREATE TABLE Rating (
+    rating_id INT PRIMARY KEY AUTO_INCREMENT,
+
+    advert_id INT NOT NULL,
+    rated_by_customer_id INT NOT NULL,
+
+    description TEXT,
+    stars INT,
+
+    FOREIGN KEY (advert_id)
+        REFERENCES advertisment(advert_id),
+
+    FOREIGN KEY (rated_by_customer_id)
+        REFERENCES student(student_id)
+);
+
+CREATE TABLE admin (
+    admin_id INT PRIMARY KEY AUTO_INCREMENT,
+    admin_username VARCHAR(50) UNIQUE NOT NULL,
+    admin_password VARCHAR(255) NOT NULL
+);
