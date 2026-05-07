@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Spaghetti Bolognese",
+    "description": "Rich tomato sauce with minced beef 🍝",
+    "portions": 3,
+    "location": "Dorm A - Room 204",
+    "time": "18:00",
+    "allergens": ["gluten"],
+    "createdAt": "2026-05-05T14:00:00"
+  },
+  {
+    "id": 2,
+    "title": "Chicken Gyros Wraps",
+    "description": "Grilled chicken with tzatziki 🌯",
+    "portions": 2,
+    "location": "Campus Cafeteria",
+    "time": "20:00",
+    "allergens": ["gluten", "milk"],
+    "createdAt": "2026-05-05T12:00:00"
+  },
+  {
+    "id": 3,
+    "title": "Vegan Lentil Soup",
+    "description": "Healthy and filling 🥣",
+    "portions": 5,
+    "location": "Dorm B - Kitchen",
+    "time": "19:30",
+    "allergens": [],
+    "createdAt": "2026-05-04T17:00:00"
+  },
+  {
+    "id": 4,
+    "title": "Pancakes with Nutella",
+    "description": "Sweet treat for dessert 🥞",
+    "portions": 0,
+    "location": "Apartment near campus",
+    "time": "21:00",
+    "allergens": ["gluten", "milk", "nuts"],
+    "createdAt": "2026-05-05T10:00:00"
+  },
+  {
+    "id": 5,
+    "title": "Greek Salad",
+    "description": "Fresh tomatoes, feta, olives 🥗",
+    "portions": 4,
+    "location": "University Garden",
+    "time": "17:30",
+    "allergens": ["milk"],
+    "createdAt": "2026-05-05T13:30:00"
+  },
+  {
+    "id": 6,
+    "title": "Homemade Pizza",
+    "description": "Cheesy and crispy 🍕",
+    "portions": 1,
+    "location": "Dorm C",
+    "time": "19:00",
+    "allergens": ["gluten", "milk"],
+    "createdAt": "2026-05-04T20:00:00"
+  }
+]

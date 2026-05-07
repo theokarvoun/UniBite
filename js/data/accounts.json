@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Alice Johnson",
+    "email": "alice@student.com",
+    "password": "password123",
+    "role": "student"
+  },
+  {
+    "id": 2,
+    "name": "Bob Smith",
+    "email": "bob@student.com",
+    "password": "password123",
+    "role": "student"
+  },
+  {
+    "id": 3,
+    "name": "Charlie Admin",
+    "email": "admin@unibite.com",
+    "password": "admin123",
+    "role": "admin"
+  },
+  {
+    "id": 4,
+    "name": "Diana Lee",
+    "email": "diana@student.com",
+    "password": "mypassword",
+    "role": "student"
+  },
+  {
+    "id": 5,
+    "name": "Ethan Manager",
+    "email": "ethan@unibite.com",
+    "password": "securepass",
+    "role": "admin"
+  }
+]
