@@ -5,33 +5,18 @@
         <title>Listing Creator</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="../css/styles.css">
     </head>
     <body>
     <div id="top-bar"></div>
     <script src="../js/components/top-bar-loader.js"></script>
   </header>
-        <h1>Create Listing</h1>
-        <form>
-            <div class ="form-group">
-                <label for="mealName">Meal Name</label>
-                <input type="text" id="mealName" name="mealName" placeholder="e.g. Pasta with Tomato Sauce" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="A delicious homemade meal..."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="quantity">Quantity</label>
-                <input type="number" id="quantity" min="1" name="quantity" placeholder="e.g. 5" required>
-            </div>
         
-            <main class="form-container">
 
-  <h1>Create Listing</h1>
+  
 
-  <form id="createPostForm">
-
+  <form class="createPostForm">
+    <h1>Create Listing</h1>
     <div class="form-group">
       <label for="mealName">Meal Name</label>
       <input type="text" id="mealName" name="mealName" required>
@@ -60,18 +45,29 @@
     <div class="form-group">
       <label>Allergens:</label>
       <div class="checkbox-group">
-        <label><input type="checkbox" name="allergens" value="gluten"> Gluten</label>
-        <label><input type="checkbox" name="allergens" value="milk"> Milk</label>
-        <label><input type="checkbox" name="allergens" value="nuts"> Nuts</label>
-      </div>
+        <label><input type="checkbox" value="celery"> Celery</label>
+  <label><input type="checkbox" value="gluten"> Cereals containing gluten</label>
+  <label><input type="checkbox" value="crustaceans"> Crustaceans</label>
+  <label><input type="checkbox" value="eggs"> Eggs</label>
+  <label><input type="checkbox" value="fish"> Fish</label>
+  <label><input type="checkbox" value="lupin"> Lupin</label>
+  <label><input type="checkbox" value="milk"> Milk</label>
+  <label><input type="checkbox" value="molluscs"> Molluscs</label>
+  <label><input type="checkbox" value="mustard"> Mustard</label>
+  <label><input type="checkbox" value="nuts"> Tree Nuts</label>
+  <label><input type="checkbox" value="peanuts"> Peanuts</label>
+  <label><input type="checkbox" value="sesame"> Sesame Seeds</label>
+  <label><input type="checkbox" value="soybeans"> Soybeans</label>
+  <label><input type="checkbox" value="sulphites"> Sulphur dioxide and sulphites</label>
+</div>
     </div>
 
     <div class="form-group">
-      <label for="image">Meal Image</label>
-      <input type="file" id="image" name="image" accept="image/*">
+      <label for="imageBtn">Meal Image</label>
+      <input type="file" class="imageBtn" name="image" accept="image/*">
     </div>
 
-    <button type="submit">Create Listing</button>
+    <button class="createListingBtn" type="submit">Create Listing</button>
 
   </form>
 

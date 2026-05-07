@@ -10,7 +10,7 @@ export function createPostCard(post) {
       </span>
     </div>
 
-    <p>${post.description}</p>
+    <p class="post-description">${post.description}</p>
 
     <div class="post-info">
       <span>🍽 ${post.portions}</span>
