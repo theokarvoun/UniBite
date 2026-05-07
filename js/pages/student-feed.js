@@ -1,5 +1,5 @@
 import { getPosts } from "../api/posts.js";
-import { createPostCard } from "../components/postCard.js";
+import { createPostCard } from "../components/post-card.js";
 
 const container = document.getElementById("postsContainer");
 
