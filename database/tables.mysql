@@ -8,7 +8,8 @@ CREATE TABLE student (
     student_name VARCHAR(64),
     student_email VARCHAR(64) UNIQUE,
     student_password VARCHAR(255),
-    advertisments_completed INT DEFAULT 0
+    advertisments_completed INT DEFAULT 0,
+    points INT DEFAULT 5
 );
 
 CREATE TABLE advertisment (

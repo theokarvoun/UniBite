@@ -25,7 +25,7 @@ const passwordInput = document.getElementById('password');
         });
 
         // Form validation
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const password = passwordInput.value;
@@ -37,23 +37,39 @@ const passwordInput = document.getElementById('password');
             }
 
             const formData = {
-                fullName: document.getElementById('fullName').value,
+                name: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
-                phone: document.getElementById('phone').value,
-                password: password,
-                dormitory: document.getElementById('dormitory').value,
-                initialCredits: 5
+                password: password
             };
 
-            // Mock registration - in production, use fetch API
-            console.log('Registration data:', formData);
-
-            // Simulate API call
+            // Disable button and show loading state
             submitBtn.disabled = true;
             submitBtn.textContent = 'Δημιουργία...';
 
-            setTimeout(() => {
+            try {
+                const res = await fetch('http://localhost:5000/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    alert(error.error || 'Registration failed!');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Δημιουργία Λογαριασμού';
+                    return;
+                }
+
+                const user = await res.json();
                 alert('Ο λογαριασμός σου δημιουργήθηκε επιτυχώς! Καλώς ήρθες στο UniBite! 🎉');
-                window.location.href = '../../pages/student-dashboard.html';
-            }, 1500);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Connection error. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Δημιουργία Λογαριασμού';
+            }
         });

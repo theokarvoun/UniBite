@@ -1,21 +1,28 @@
-const API_URL = "http://localhost:5000/api/accounts";
-
-export async function getAccounts() {
-    console.log("Fetching accounts...");
-  const res = await fetch(`${API_URL}`);
-  console.log("Response received:", res);
-  return await res.json();
-}
+const LOGIN_URL = "http://localhost:5000/api/users/login";
 
 export async function login(email, password) {
-    // Mock login - in production, use fetch API to authenticate
-    console.log('Login attempt:', { email, password });
-    const accounts = await getAccounts();
-    if (accounts.some(acc => acc.email === email && acc.password === password && acc.role === 'student')) {
-        window.location.href = '../../pages/student-dashboard.html';
-    } else if (accounts.some(acc => acc.email === email && acc.password === password && acc.role === 'admin')) {
-        window.location.href = '../../pages/admin-dashboard.html';
-    } else {
-        alert('Invalid credentials!');
+    try {
+        const res = await fetch(LOGIN_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            alert(error.error || 'Login failed!');
+            return;
+        }
+
+        const user = await res.json();
+        // Store user info and redirect
+        localStorage.setItem('user', JSON.stringify(user));
+        window.location.href = 'student-feed.html';
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Connection error. Please try again.');
     }
 }
+
