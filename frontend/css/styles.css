@@ -363,6 +363,31 @@ main {
     gap: 1rem;
 }
 
+.user-display {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.user-name {
+    color: var(--text-color);
+}
+
+.user-points {
+    background-color: #ffeaa7;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.user-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
 .card.inactive {
     opacity: 0.5; /* Οπτική επισήμανση για εξαντλημένες μερίδες */
     filter: grayscale(100%);

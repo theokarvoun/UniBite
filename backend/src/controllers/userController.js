@@ -3,11 +3,11 @@ import pool from '../config/db.js';
 // LOGIN user
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, points} = req.body;
 
     const [rows] = await pool.query(
-      'SELECT student_id, student_name, student_email FROM student WHERE student_email = ? AND student_password = ?',
-      [email, password]
+      'SELECT student_id, student_name, student_email, points FROM student WHERE student_email = ? AND student_password = ?',
+      [email, password, points]
     );
 
     if (rows.length === 0) {
@@ -20,7 +20,8 @@ export const login = async (req, res) => {
     res.json({
       id: student.student_id,
       name: student.student_name,
-      email: student.student_email
+      email: student.student_email,
+      points: student.points
     });
 
   } catch (error) {
