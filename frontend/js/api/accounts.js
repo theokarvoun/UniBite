@@ -1,6 +1,8 @@
+const API_URL = "http://localhost:5000/api/accounts";
+
 export async function getAccounts() {
     console.log("Fetching accounts...");
-  const res = await fetch("../data/accounts.json");
+  const res = await fetch(`${API_URL}`);
   console.log("Response received:", res);
   return await res.json();
 }

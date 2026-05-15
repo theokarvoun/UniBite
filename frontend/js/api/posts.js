@@ -1,13 +1,21 @@
-export async function getPosts() {
-    console.log("Fetching posts...");
-    //Note: Rest in html page for now
-  const res = await fetch("../../frontend/js/data/posts.json");
-  console.log("Response received:", res);
-  const data = await res.json();
+const API_URL = "http://localhost:5000/api/posts";
 
-  // simulate backend logic
-  return data.map(post => ({
-    ...post,
-    status: post.portions > 0 ? "available" : "sold-out"
-  }));
+export async function getPosts() {
+
+  try {
+
+    const res = await fetch(API_URL);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch posts");
+    }
+
+    return await res.json();
+
+  } catch (error) {
+
+    console.error(error);
+
+    return [];
+  }
 }
