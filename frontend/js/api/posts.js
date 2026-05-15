@@ -19,3 +19,27 @@ export async function getPosts() {
     return [];
   }
 }
+
+export async function createPost(postData) {
+
+  try {
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(postData)
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create post");
+    }
+
+    return await res.json();
+
+  } catch (error) {
+
+    console.error(error);
+
+    return null;
+  }
+}
