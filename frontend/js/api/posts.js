@@ -20,14 +20,14 @@ export async function getPosts() {
   }
 }
 
-export async function createPost(postData) {
+export async function createPost(formData) {
 
   try {
 
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(postData)
+      body: formData
+      // Don't set Content-Type header - browser will set it with proper boundary
     });
 
     if (!res.ok) {

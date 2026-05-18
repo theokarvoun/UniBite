@@ -22,6 +22,18 @@ export function createPostCard(post) {
     return dateStr;
   }
 
+  // Construct proper image URL pointing to backend server
+  let imageUrl = '';
+  if (post.image) {
+    if (post.image.startsWith('http')) {
+      imageUrl = post.image; // Already a full URL
+    } else if (post.image.startsWith('/')) {
+      imageUrl = `http://localhost:5000${post.image}`; // Prepend backend URL
+    } else {
+      imageUrl = `http://localhost:5000/uploads/${post.image}`; // Just filename, add full path
+    }
+  }
+
   const allergiesHtml = (post.allergies && post.allergies.length)
     ? `<p class="allergens">⚠️ <strong>Allergens:</strong> ${post.allergies.map(a => escapeHtml(a)).join(', ')}</p>`
     : '';
@@ -33,6 +45,8 @@ export function createPostCard(post) {
         ${post.status === "available" ? "Available" : "Sold Out"}
       </span>
     </div>
+
+    ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(post.title)}" class="post-image">` : ''}
 
     <p class="post-description">${post.description}</p>
 

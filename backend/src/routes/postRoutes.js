@@ -1,5 +1,5 @@
 import express from "express";
-
+import { upload } from "../middleware/uploadMiddleware.js";
 import {
   getPosts,
   createPost
@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.get("/", getPosts);
 
-router.post("/", createPost);
+router.post("/", upload.single("image"), createPost);
 
 export default router;

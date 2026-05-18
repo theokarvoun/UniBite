@@ -81,29 +81,93 @@ export async function createPost(req, res) {
     const {
       title,
       description,
-      portions
+      portions,
+      location,
+      time,
+      allergies
     } = req.body;
+
+    // Validation
+    if (!title || !description || !portions) {
+      console.log("Missing required fields:", { title, description, portions });
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Get the image filename if uploaded
+    const imageFilename = req.file ? req.file.filename : null;
+
+    // TODO: Get creator_student_id from authenticated user session
+    // For now using a placeholder value
+    const creatorStudentId = 1;
+
+    console.log("Creating post with data:", { title, description, portions, location, time, imageFilename });
 
     const [result] = await pool.query(`
       INSERT INTO advertisment
-      (food_name, food_description, food_amount)
-      VALUES (?, ?, ?)
+      (creator_student_id, food_name, food_description, food_amount, food_photo, delivery_location, delivery_time, state_of_ad, date_of_creation)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURDATE())
     `, [
+      creatorStudentId,
       title,
       description,
-      portions
+      portions,
+      imageFilename,
+      location || null,
+      time || null,
+      'ACTIVE'
     ]);
 
+    const advertId = result.insertId;
+    console.log("Post created with ID:", advertId);
+
+    // Handle allergies if provided
+    if (allergies) {
+      try {
+        let allergyList = allergies;
+        if (typeof allergies === 'string') {
+          allergyList = JSON.parse(allergies);
+        }
+        
+        if (Array.isArray(allergyList) && allergyList.length > 0) {
+          for (const allergyName of allergyList) {
+            // Get or create allergy type
+            const [typeResult] = await pool.query(`
+              SELECT type_id FROM allergy_type WHERE name = ?
+            `, [allergyName]);
+
+            let typeId;
+            if (typeResult.length > 0) {
+              typeId = typeResult[0].type_id;
+            } else {
+              const [insertResult] = await pool.query(`
+                INSERT INTO allergy_type (name) VALUES (?)
+              `, [allergyName]);
+              typeId = insertResult.insertId;
+            }
+
+            // Insert allergy relationship
+            await pool.query(`
+              INSERT INTO allergy (advert_id, type_id) VALUES (?, ?)
+            `, [advertId, typeId]);
+          }
+        }
+      } catch (allergyError) {
+        console.error("Error processing allergies:", allergyError);
+        // Continue even if allergies fail
+      }
+    }
+
     res.status(201).json({
-      id: result.insertId
+      id: advertId,
+      image: imageFilename
     });
 
   } catch (error) {
 
-    console.error(error);
+    console.error("Error creating post:", error.message);
 
     res.status(500).json({
-      error: "Server error"
+      error: "Server error: " + error.message
     });
   }
 }

@@ -25,7 +25,7 @@ CREATE TABLE advertisment (
     food_amount INT,
 
     delivery_location VARCHAR(64),
-    delivery_time DATE,
+    delivery_time TIME,
     date_of_creation DATE,
 
     state_of_ad ENUM('ACTIVE', 'INACTIVE', 'DELETED'),
