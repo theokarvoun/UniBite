@@ -90,3 +90,15 @@ CREATE TABLE admin (
     admin_username VARCHAR(50) UNIQUE NOT NULL,
     admin_password VARCHAR(255) NOT NULL
 );
+
+
+-- Users for database connection
+
+CREATE USER 'unibite_user'@'localhost'
+IDENTIFIED BY 'mypassword';
+
+GRANT ALL PRIVILEGES
+ON Unibite.*
+TO 'unibite_user'@'localhost';
+
+FLUSH PRIVILEGES;
