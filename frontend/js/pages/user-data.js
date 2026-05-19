@@ -1,22 +1,28 @@
 // Retrieve user data from localStorage
-function displayUserInfo() {
+async function displayUserInfo() {
   const userInfo = document.getElementById('user-info');
-  
-  // If element doesn't exist yet (top-bar loading), retry
   if (!userInfo) {
     setTimeout(displayUserInfo, 100);
     return;
   }
-  
-  const storedUser = localStorage.getItem('user');
 
+  // Still need the ID from localStorage to know who to fetch
+  const storedUser = localStorage.getItem('user');
   if (!storedUser) {
     userInfo.innerHTML = '<span>Not logged in</span>';
     return;
   }
 
+  const { id } = JSON.parse(storedUser);
+
   try {
-    const user = JSON.parse(storedUser);
+    // 👇 Fetch fresh data from DB every time
+    const response = await fetch(`http://localhost:5000/api/users/${id}`);
+    const user = await response.json();
+
+    // Update localStorage to keep it in sync
+    localStorage.setItem('user', JSON.stringify(user));
+
     userInfo.innerHTML = `
       <div class="user-display">
         <span class="user-name">${user.name}</span>
@@ -24,7 +30,7 @@ function displayUserInfo() {
       </div>
     `;
   } catch (error) {
-    console.error('Error parsing user data:', error);
+    console.error('Error fetching user data:', error);
     userInfo.innerHTML = '<span>Error loading user info</span>';
   }
 }

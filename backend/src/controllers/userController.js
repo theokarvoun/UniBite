@@ -74,3 +74,29 @@ export const createUser = async (req, res) => {
     });
   }
 };
+
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query(
+      'SELECT student_id, student_name, student_email, points FROM student WHERE student_id = ?',
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const student = rows[0];
+    res.json({
+      id: student.student_id,
+      name: student.student_name,
+      email: student.student_email,
+      points: student.points
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
