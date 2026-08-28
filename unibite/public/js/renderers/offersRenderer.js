@@ -84,6 +84,10 @@ export function displayUserOffers(data, actions = {}) {
                 actions.onRejectClaim(selectedOffer, matchedClaim);
             }
 
+            if (action === "confirm-pickup" && actions.onConfirmPickup) {
+                actions.onConfirmPickup(selectedOffer, matchedClaim);
+            }
+
             if (action === "rate-claim" && actions.onRateClaim) {
                 actions.onRateClaim(selectedOffer, matchedClaim, score);
             }

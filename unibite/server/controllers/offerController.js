@@ -154,6 +154,15 @@ export async function getUserClaimedOffers(req, res) {
             r.status,
             r.claimed_portions,
             r.created_at AS claim_created_at,
+            EXISTS (
+                SELECT 1 FROM ratings rating
+                WHERE rating.req_id = r.request_id AND rating.rater_id = r.con_id
+            ) AS has_rating,
+            (
+                SELECT rating.score FROM ratings rating
+                WHERE rating.req_id = r.request_id AND rating.rater_id = r.con_id
+                LIMIT 1
+            ) AS rating_score,
             o.title,
             o.description,
             o.portions AS quantity,
@@ -341,6 +350,45 @@ export async function rejectOfferClaim(req, res) {
     }
 }
 
+export async function confirmOfferPickup(req, res) {
+    const { offerId, requestId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ message: "userId is required" });
+    }
+
+    try {
+        const [claimResults] = await db.query(
+            `SELECT r.*, o.creator_id FROM requests r JOIN offers o ON o.id = r.ad_id WHERE r.request_id = ? AND r.ad_id = ?`,
+            [requestId, offerId]
+        );
+
+        if (claimResults.length === 0) {
+            return res.status(404).json({ message: "Claim not found" });
+        }
+
+        const claim = claimResults[0];
+        if (Number(claim.creator_id) !== Number(userId)) {
+            return res.status(403).json({ message: "Only the offer creator can confirm pickup." });
+        }
+
+        if (claim.status !== "ACCEPTED") {
+            return res.status(400).json({ message: "Only accepted claims can be confirmed as picked up." });
+        }
+
+        await db.query(
+            `UPDATE requests SET status = 'PICKED_UP', updated_at = NOW() WHERE request_id = ?`,
+            [requestId]
+        );
+
+        return res.json({ success: true, message: "Pickup confirmed." });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Database error" });
+    }
+}
+
 export async function rateClaim(req, res) {
     const { requestId } = req.params;
     const { raterId, score, comment = "" } = req.body;
@@ -356,7 +404,7 @@ export async function rateClaim(req, res) {
 
     try {
         const [claimResults] = await db.query(
-            `SELECT r.*, o.creator_id FROM requests r JOIN offers o ON o.id = r.ad_id WHERE r.request_id = ? AND r.status = 'ACCEPTED'`,
+            `SELECT r.*, o.creator_id FROM requests r JOIN offers o ON o.id = r.ad_id WHERE r.request_id = ? AND r.status = 'PICKED_UP'`,
             [requestId]
         );
 
@@ -377,16 +425,13 @@ export async function rateClaim(req, res) {
         );
 
         if (existingMarks.length > 0) {
-            await db.query(
-                `UPDATE ratings SET score = ?, comment = ?, rated_user_id = ? WHERE req_id = ? AND rater_id = ?`,
-                [rating, comment.trim(), ratedUserId, requestId, raterId]
-            );
-        } else {
-            await db.query(
-                `INSERT INTO ratings (req_id, rater_id, rated_user_id, score, comment) VALUES (?, ?, ?, ?, ?)`,
-                [requestId, raterId, ratedUserId, rating, comment.trim()]
-            );
+            return res.status(409).json({ message: "You have already rated this pickup." });
         }
+
+        await db.query(
+            `INSERT INTO ratings (req_id, rater_id, rated_user_id, score, comment) VALUES (?, ?, ?, ?, ?)`,
+            [requestId, raterId, ratedUserId, rating, comment.trim()]
+        );
 
         await db.query(
             `UPDATE users SET points = points + ? WHERE id = ?`,

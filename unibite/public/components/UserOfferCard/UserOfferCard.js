@@ -16,7 +16,7 @@ export function shouldShowRatingForClaim(claim, currentUserId) {
         return false;
     }
 
-    return String(claim.status || "").toUpperCase() === "ACCEPTED" && Number(claim.con_id) === Number(currentUserId);
+    return String(claim.status || "").toUpperCase() === "PICKED_UP" && Number(claim.con_id) === Number(currentUserId);
 }
 
 export function createUserOfferCard(offer, onClick) {
@@ -34,6 +34,7 @@ export function createUserOfferCard(offer, onClick) {
             ${claims.map((claim) => {
                 const claimStatus = claim.status || "PENDING";
                 const isPending = claimStatus === "PENDING";
+                const isAccepted = String(claimStatus).toUpperCase() === "ACCEPTED";
                 const shouldShowRating = shouldShowRatingForClaim(claim, currentUserId);
                 const starButtons = shouldShowRating
                     ? `<div class="claim-rating-row">
@@ -55,6 +56,11 @@ export function createUserOfferCard(offer, onClick) {
                             <div class="claim-action-row">
                                 <button type="button" class="accept-claim-button" data-request-id="${claim.request_id}">Accept</button>
                                 <button type="button" class="reject-claim-button" data-request-id="${claim.request_id}">Reject</button>
+                            </div>
+                        ` : ""}
+                        ${isAccepted ? `
+                            <div class="claim-action-row">
+                                <button type="button" class="confirm-pickup-button" data-request-id="${claim.request_id}">Confirm pickup</button>
                             </div>
                         ` : ""}
                         ${starButtons}
@@ -120,6 +126,14 @@ export function createUserOfferCard(offer, onClick) {
             const requestId = Number(button.dataset.requestId);
             const matchedClaim = claims.find((claim) => Number(claim.request_id) === requestId);
             onClick("reject-claim", offer, matchedClaim);
+        });
+    });
+
+    card.querySelectorAll(".confirm-pickup-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const requestId = Number(button.dataset.requestId);
+            const matchedClaim = claims.find((claim) => Number(claim.request_id) === requestId);
+            onClick("confirm-pickup", offer, matchedClaim);
         });
     });
 

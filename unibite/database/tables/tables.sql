@@ -90,6 +90,12 @@ CREATE TABLE requests(
     request_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     ad_id INT NOT NULL,
     con_id INT,
+    claimed_portions INT NOT NULL DEFAULT 1,
+    status ENUM('PENDING', 'ACCEPTED', 'REJECTED', 'PICKED_UP') NOT NULL DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    accepted_at TIMESTAMP NULL,
+    rejected_at TIMESTAMP NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_advertisment
         FOREIGN KEY(ad_id)

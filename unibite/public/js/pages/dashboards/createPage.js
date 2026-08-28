@@ -174,8 +174,17 @@ function createClaimedOfferCard(offer, onRate) {
     article.className = "claimed-offer-card";
 
     const status = String(offer.status || "PENDING").toUpperCase();
-    const isAccepted = status === "ACCEPTED";
-    const isRated = false;
+    const isPickedUp = status === "PICKED_UP";
+    const ratingScore = Number(offer.rating_score);
+    const hasRating = offer.rating_score !== null
+        && offer.rating_score !== undefined
+        && Number.isFinite(ratingScore);
+    const ratingMarkup = isPickedUp ? `
+        <div class="claim-rating-row">
+            <span>${hasRating ? "Your rating" : "Rate creator"}</span>
+            ${[1,2,3,4,5].map((star) => `<button type="button" class="rating-star${hasRating && star === ratingScore ? " selected" : ""}" data-score="${star}"${hasRating ? " disabled" : ""}>★</button>`).join("")}
+        </div>
+    ` : "";
 
     article.innerHTML = `
         <div class="claimed-offer-top">
@@ -195,15 +204,10 @@ function createClaimedOfferCard(offer, onRate) {
             <span>Room ${offer.room || "TBA"}</span>
         </div>
 
-        ${isAccepted ? `
-            <div class="claim-rating-row">
-                <span>Rate creator</span>
-                ${[1,2,3,4,5].map((star) => `<button type="button" class="rating-star" data-score="${star}">★</button>`).join("")}
-            </div>
-        ` : ""}
+        ${ratingMarkup}
     `;
 
-    if (isAccepted) {
+    if (isPickedUp && !hasRating) {
         article.querySelectorAll(".rating-star").forEach((button) => {
             button.addEventListener("click", () => onRate(offer, Number(button.dataset.score)));
         });
@@ -265,6 +269,7 @@ async function refreshOffers() {
         onDelete: deleteOffer,
         onAcceptClaim: acceptClaim,
         onRejectClaim: rejectClaim,
+        onConfirmPickup: confirmPickup,
         onRateClaim: rateClaim
     });
 }
@@ -330,6 +335,39 @@ async function rejectClaim(offer, claim) {
     } catch (error) {
         console.error(error);
         alert(error.message || "Unable to reject claim.");
+    }
+}
+
+async function confirmPickup(offer, claim) {
+    const userId = getCurrentUserId();
+    if (!userId) {
+        alert("You need to be logged in to confirm pickup.");
+        return;
+    }
+
+    if (!claim?.request_id) {
+        alert("No claim selected.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/offers/${offer.id}/claims/${claim.request_id}/confirm-pickup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || "Failed to confirm pickup.");
+        }
+
+        alert("Pickup confirmed.");
+        refreshOffers();
+        refreshClaimedOffers();
+    } catch (error) {
+        console.error(error);
+        alert(error.message || "Unable to confirm pickup.");
     }
 }
 

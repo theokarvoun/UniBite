@@ -214,6 +214,26 @@ body {
     color: #2d5d36;
 }
 
+.claim-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.confirm-pickup-button {
+    border: 1px solid #b9d8bd;
+    border-radius: 8px;
+    background: #edf8ee;
+    color: #226c2d;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.confirm-pickup-button:hover {
+    background: #d9f0db;
+}
+
 .rating-star {
     border: none;
     background: #f4f7f4;
@@ -223,6 +243,18 @@ body {
     border-radius: 8px;
     padding: 2px 6px;
     transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.rating-star.selected,
+.rating-star.selected:hover {
+    background: #fff2bf;
+    color: #c58b00;
+    transform: scale(1.08);
+}
+
+.rating-star:disabled {
+    cursor: default;
+    opacity: 1;
 }
 
 .rating-star:hover {

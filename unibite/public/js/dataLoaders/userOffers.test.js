@@ -20,8 +20,9 @@ test('mergeClaimsIntoOffers attaches claim arrays to each offer by id', () => {
   assert.deepEqual(merged[1].claims, []);
 });
 
-test('shouldShowRatingForClaim only appears for the claimant on accepted claims', () => {
-  assert.equal(shouldShowRatingForClaim({ status: 'ACCEPTED', con_id: 5 }, 5), true);
+test('shouldShowRatingForClaim only appears for the claimant after pickup', () => {
+  assert.equal(shouldShowRatingForClaim({ status: 'PICKED_UP', con_id: 5 }, 5), true);
+  assert.equal(shouldShowRatingForClaim({ status: 'ACCEPTED', con_id: 5 }, 5), false);
   assert.equal(shouldShowRatingForClaim({ status: 'ACCEPTED', con_id: 9 }, 5), false);
   assert.equal(shouldShowRatingForClaim({ status: 'PENDING', con_id: 5 }, 5), false);
 });
