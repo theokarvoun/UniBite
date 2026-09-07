@@ -180,7 +180,7 @@ function createClaimedOfferCard(offer, onRate) {
 
     const status = String(offer.status || "PENDING").toUpperCase();
     const isAccepted = status === "ACCEPTED";
-    const isRated = false;
+    const isNotPicked = String(offer.state_of_delivery || "").toUpperCase() === "MISSED";
 
     article.innerHTML = `
         <div class="claimed-offer-top">
@@ -200,7 +200,11 @@ function createClaimedOfferCard(offer, onRate) {
             <span>Room ${offer.room || "TBA"}</span>
         </div>
 
-        ${isAccepted ? `
+        ${isNotPicked ? `
+            <div class="claim-delivery-status missed">Marked as not picked by the creator</div>
+        ` : ""}
+
+        ${isAccepted && !isNotPicked ? `
             <div class="claim-rating-row">
                 <span>Rate creator</span>
                 ${[1, 2, 3, 4, 5].map((star) => `<button type="button" class="rating-star" data-score="${star}">★</button>`).join("")}
@@ -270,6 +274,7 @@ async function refreshOffers() {
         onDelete: deleteOffer,
         onAcceptClaim: acceptClaim,
         onRejectClaim: rejectClaim,
+        onNotPicked: markClaimNotPicked,
         onRateClaim: rateClaim
     });
 }
@@ -335,6 +340,38 @@ async function rejectClaim(offer, claim) {
     } catch (error) {
         console.error(error);
         showNotification(error.message || "Unable to reject claim.", "error");
+    }
+}
+
+async function markClaimNotPicked(offer, claim) {
+    const userId = getCurrentUserId();
+    if (!userId) {
+        showNotification("You need to be logged in to mark a claim as not picked.", "error");
+        return;
+    }
+
+    if (!claim?.request_id) {
+        showNotification("No claim selected.", "error");
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/offers/${offer.id}/claims/${claim.request_id}/not-picked`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || "Failed to mark claim as not picked.");
+        }
+
+        showNotification("Claim marked as not picked.", "info");
+        refreshOffers();
+    } catch (error) {
+        console.error(error);
+        showNotification(error.message || "Unable to mark claim as not picked.", "error");
     }
 }
 

@@ -13,6 +13,25 @@ function loadOfferCardCSS() {
     }
 }
 
+function formatPickupTime(value) {
+    if (!value) {
+        return "Pickup time not set";
+    }
+
+    const pickupDate = new Date(value);
+    if (Number.isNaN(pickupDate.getTime())) {
+        return value;
+    }
+
+    return pickupDate.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 // Function to create an offer card
 export function createOfferCard(offer, onClick) {
 
@@ -50,6 +69,10 @@ export function createOfferCard(offer, onClick) {
 
             <p class="offer-portions">
                 Μερίδες: ${offer.quantity}
+            </p>
+
+            <p class="offer-pickup">
+                <strong>Pickup:</strong> ${formatPickupTime(offer.pickup_time)}
             </p>
 
             <p class="offer-price">

@@ -11,12 +11,33 @@ function loadUserOfferCardCSS() {
     }
 }
 
+function formatPickupTime(value) {
+    if (!value) {
+        return "Pickup time not set";
+    }
+
+    const pickupDate = new Date(value);
+    if (Number.isNaN(pickupDate.getTime())) {
+        return value;
+    }
+
+    return pickupDate.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 export function shouldShowRatingForClaim(claim, currentUserId) {
     if (!claim || !currentUserId) {
         return false;
     }
 
-    return String(claim.status || "").toUpperCase() === "ACCEPTED" && Number(claim.con_id) === Number(currentUserId);
+    return String(claim.status || "").toUpperCase() === "ACCEPTED"
+        && claim.state_of_delivery !== "MISSED"
+        && Number(claim.con_id) === Number(currentUserId);
 }
 
 export function createUserOfferCard(offer, onClick) {
@@ -34,6 +55,7 @@ export function createUserOfferCard(offer, onClick) {
             ${claims.map((claim) => {
                 const claimStatus = claim.status || "PENDING";
                 const isPending = claimStatus === "PENDING";
+                const isNotPicked = claim.state_of_delivery === "MISSED";
                 const shouldShowRating = shouldShowRatingForClaim(claim, currentUserId);
                 const starButtons = shouldShowRating
                     ? `<div class="claim-rating-row">
@@ -57,6 +79,12 @@ export function createUserOfferCard(offer, onClick) {
                                 <button type="button" class="reject-claim-button" data-request-id="${claim.request_id}">Reject</button>
                             </div>
                         ` : ""}
+                        ${claimStatus === "ACCEPTED" && !isNotPicked ? `
+                            <div class="claim-action-row">
+                                <button type="button" class="not-picked-button" data-request-id="${claim.request_id}">Mark as not picked</button>
+                            </div>
+                        ` : ""}
+                        ${isNotPicked ? `<div class="claim-delivery-status missed">Not picked</div>` : ""}
                         ${starButtons}
                     </div>
                 `;
@@ -84,6 +112,8 @@ export function createUserOfferCard(offer, onClick) {
                     month: "2-digit"
                 })}</span>
             </div>
+
+            <div class="user-offer-pickup"><strong>Pickup:</strong> ${formatPickupTime(offer.pickup_time)}</div>
 
             <p class="user-offer-description">${offer.description}</p>
 
@@ -120,6 +150,14 @@ export function createUserOfferCard(offer, onClick) {
             const requestId = Number(button.dataset.requestId);
             const matchedClaim = claims.find((claim) => Number(claim.request_id) === requestId);
             onClick("reject-claim", offer, matchedClaim);
+        });
+    });
+
+    card.querySelectorAll(".not-picked-button").forEach((button) => {
+        button.addEventListener("click", () => {
+            const requestId = Number(button.dataset.requestId);
+            const matchedClaim = claims.find((claim) => Number(claim.request_id) === requestId);
+            onClick("not-picked", offer, matchedClaim);
         });
     });
 

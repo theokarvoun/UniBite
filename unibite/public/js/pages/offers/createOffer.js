@@ -476,6 +476,16 @@ async function handleFormSubmit(event) {
             "room_number"
         ).value.trim();
 
+    const pickupTime =
+        document.getElementById(
+            "pickup_time"
+        ).value.trim();
+
+    const pickupDate =
+        document.getElementById(
+            "pickup_date"
+        ).value.trim();
+
     const imageFile =
         imageInput.files[0];
 
@@ -550,6 +560,7 @@ async function handleFormSubmit(event) {
         price
     );
 
+
     formData.append(
         "quantity",
         quantity
@@ -573,6 +584,16 @@ async function handleFormSubmit(event) {
     formData.append(
         "room_number",
         roomNumber
+    );
+    
+    formData.append(
+        "pickup_time",
+        pickupTime
+    );
+
+    formData.append(
+        "pickup_date",
+        pickupDate
     );
 
 

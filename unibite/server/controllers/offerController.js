@@ -1,5 +1,5 @@
 import db from "../database/connection.js";
-import { calculateRemainingQuantity, canAcceptClaim, canClaimOffer } from "./offerClaimLogic.js";
+import { canAcceptClaim, canClaimOffer } from "./offerClaimLogic.js";
 
 function normalizeOffer(offer) {
     return {
@@ -14,6 +14,7 @@ function normalizeOffer(offer) {
         image: offer.image ?? offer.path_to_picture ?? null,
         building_name: offer.building_name ?? offer.building ?? null,
         room_number: offer.room_number ?? offer.room ?? null,
+        pickup_time: offer.pickup_time ?? offer.date_of_delivery ?? null,
         date_posted: offer.date_posted ?? offer.pickup_time ?? offer.created_at ?? null,
         created_at: offer.created_at ?? offer.date_posted ?? null
     };
@@ -55,7 +56,7 @@ export async function getOfferExcludingUser(req, res) {
 export async function getUserOffers(req, res) {
     const { userId } = req.params;
 
-    const sql = `SELECT * FROM advertisments WHERE creator_id = ? AND state_of_ad != 'DELETED' AND portions > 0 ORDER BY date_posted DESC`;
+    const sql = `SELECT * FROM advertisments WHERE creator_id = ? AND state_of_ad != 'DELETED' ORDER BY date_posted DESC`;
 
     try {
         const [results] = await db.query(sql, [userId]);
@@ -139,6 +140,7 @@ export async function getUserClaimedOffers(req, res) {
                 r.id AS id,
                 r.con_id,
                 r.status,
+                r.state_of_delivery,
                 r.claimed_portions,
                 r.created_at AS claim_created_at,
                 o.title,
@@ -267,8 +269,16 @@ export async function acceptOfferClaim(req, res) {
             return res.json({ success: true, message: "Claim is already accepted." });
         }
 
-        const remaining = calculateRemainingQuantity({ portions: Number(claim.portions) }, [{ status: 'ACCEPTED', claimed_portions: Number(claim.claimed_portions) }]);
         const acceptedCount = Number(claim.claimed_portions || 1);
+
+        const [acceptedClaims] = await db.query(
+            `SELECT COALESCE(SUM(claimed_portions), 0) AS total_accepted
+             FROM requests
+             WHERE id = ? AND status = 'ACCEPTED' AND request_id != ?`,
+            [offerId, requestId]
+        );
+
+        const remaining = Number(claim.portions) - Number(acceptedClaims[0]?.total_accepted || 0);
 
         if (remaining < acceptedCount) {
             return res.status(400).json({ message: "This claim exceeds the remaining offer quantity." });
@@ -327,6 +337,54 @@ export async function rejectOfferClaim(req, res) {
     }
 }
 
+export async function markOfferClaimNotPicked(req, res) {
+    const { offerId, requestId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ message: "userId is required" });
+    }
+
+    try {
+        const [claimResults] = await db.query(
+            `SELECT r.*, o.creator_id
+             FROM requests r
+             JOIN advertisments o ON o.id = r.id
+             WHERE r.request_id = ? AND r.id = ?`,
+            [requestId, offerId]
+        );
+
+        if (claimResults.length === 0) {
+            return res.status(404).json({ message: "Claim not found" });
+        }
+
+        const claim = claimResults[0];
+        if (Number(claim.creator_id) !== Number(userId)) {
+            return res.status(403).json({ message: "Only the offer creator can mark a claim as not picked." });
+        }
+
+        if (claim.status !== "ACCEPTED") {
+            return res.status(400).json({ message: "Only accepted claims can be marked as not picked." });
+        }
+
+        if (claim.state_of_delivery === "MISSED") {
+            return res.json({ success: true, message: "Claim is already marked as not picked." });
+        }
+
+        await db.query(
+            `UPDATE requests
+             SET state_of_delivery = 'MISSED', updated_at = NOW()
+             WHERE request_id = ?`,
+            [requestId]
+        );
+
+        return res.json({ success: true, message: "Claim marked as not picked." });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Database error", error: err.message });
+    }
+}
+
 export async function rateClaim(req, res) {
     const { requestId } = req.params;
     const { raterId, score, comment = "" } = req.body;
@@ -354,6 +412,10 @@ export async function rateClaim(req, res) {
         const validRater = Number(raterId) === Number(claim.con_id);
         if (!validRater) {
             return res.status(403).json({ message: "Only the claimant can rate this request." });
+        }
+
+        if (claim.state_of_delivery === "MISSED") {
+            return res.status(400).json({ message: "Claims marked as not picked cannot be rated." });
         }
 
         const ratedUserId = Number(claim.creator_id);
@@ -387,10 +449,10 @@ export async function rateClaim(req, res) {
 }
 
 export async function createOffer(req, res) {
-    const { creator_id, title, description, price, latitude, longitude, quantity, building_name, room_number } = req.body;
+    const { creator_id, title, description, price, latitude, longitude, quantity, building_name, room_number, pickup_time, pickup_date } = req.body;
     const image = req.file;
     const path_to_image = image ? `/uploads/offers/${image.filename}` : null;
-
+    const pickupDateTime = pickup_date && pickup_time ? new Date(`${pickup_date}T${pickup_time}`) : null;
     if (!building_name || !room_number) {
         return res.status(400).json({ message: "Building name and room number are required" });
     }
@@ -428,10 +490,11 @@ export async function createOffer(req, res) {
             location_lng,
             building_name,
             room_number,
+            date_of_delivery,
             path_to_picture,
             point_cost,
             state_of_ad
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     try {
@@ -444,6 +507,7 @@ export async function createOffer(req, res) {
             parsedLongitude,
             parsedBuildingName.trim(),
             parsedRoomNumber.trim(),
+            pickupDateTime,
             path_to_image,
             parsedPrice,
             'ACTIVE'
@@ -458,7 +522,7 @@ export async function createOffer(req, res) {
 
 export async function updateOffer(req, res) {
     const { offerId } = req.params;
-    const { userId, title, description, price, latitude, longitude, quantity, building_name, room_number } = req.body;
+    const { userId, title, description, price, latitude, longitude, quantity, building_name, room_number, pickup_time, pickup_date } = req.body;
     const image = req.file;
     const path_to_image = image ? `/uploads/offers/${image.filename}` : null;
 
@@ -490,7 +554,7 @@ export async function updateOffer(req, res) {
 
         const sql = `
             UPDATE advertisments
-            SET title = ?, description = ?, point_cost = ?, location_lat = ?, location_lng = ?, portions = ?, building_name = ?, room_number = ?, path_to_picture = ?
+            SET title = ?, description = ?, point_cost = ?, location_lat = ?, location_lng = ?, portions = ?, building_name = ?, room_number = ?, path_to_picture = ?, date_of_delivery = ?
             WHERE id = ?
         `;
 
@@ -504,6 +568,7 @@ export async function updateOffer(req, res) {
             nextBuildingName.trim(),
             nextRoomNumber.trim(),
             path_to_image ?? currentOffer.path_to_picture,
+            pickup_date && pickup_time ? new Date(`${pickup_date}T${pickup_time}`) : currentOffer.date_of_delivery,
             offerId
         ]);
 

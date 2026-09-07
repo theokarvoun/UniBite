@@ -105,6 +105,15 @@
     font-weight: 700;
 }
 
+.user-offer-pickup {
+    color: #2e7d32;
+    background: #f2fbf2;
+    border: 1px solid #dfeee0;
+    border-radius: 10px;
+    padding: 9px 11px;
+    font-size: 13px;
+}
+
 .user-offer-description {
     margin: 0;
     color: #5a695e;
@@ -171,6 +180,24 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
+}
+
+.not-picked-button {
+    width: 100%;
+    border: 1.5px solid #e0a12b;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff8e7;
+    color: #8a5a00;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.claim-delivery-status {
+    color: #8a5a00;
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .edit-button {

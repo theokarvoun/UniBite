@@ -33,6 +33,10 @@ export function createOfferDetails(offer) {
             <p>${offer.room_number}</p>
         </div>
 
+        <div class="offer-details-pickup">
+            <strong>Pickup:</strong> ${formatPickupTime(offer.pickup_time)}
+        </div>
+
         <div class="offer-details-claim-button-wrapper">
             <button class="offer-details-claim-button">
                 CLAIM FOR 🟡${offer.price}
@@ -45,7 +49,27 @@ export function createOfferDetails(offer) {
     return card;
 }
 
+function formatPickupTime(value) {
+    if (!value) {
+        return "Pickup time not set";
+    }
+
+    const pickupDate = new Date(value);
+    if (Number.isNaN(pickupDate.getTime())) {
+        return value;
+    }
+
+    return pickupDate.toLocaleString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 // Load component CSS once
+// Function to create offer details card purely the html and css
 function loadOfferDetailsCSS() {
     if (!document.querySelector('link[href="../../components/OfferDetails/OfferDetails.css"]')) {
         const link = document.createElement("link");
